@@ -41,7 +41,8 @@ class Passenger {
     String Gender;
     int Age;
 
-    public Passenger(String Passenger_Name, String Email, double Mobile_No, String Gender, int Age) {
+    public Passenger(int NoOfPassangers, String Passenger_Name, String Email, double Mobile_No, String Gender, int Age) {
+        this.NoOfPassangers=NoOfPassangers;
         this.Passenger_Name = Passenger_Name;
         this.Email = Email;
         this.Mobile_No = Mobile_No;
@@ -50,8 +51,13 @@ class Passenger {
     }
 
     public String collectPassengerDetails() {
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Enter Your Name Here:");
+    Scanner sc = new Scanner(System.in);
+    System.out.println("Enter No Of Passengers:");
+    this.NoOfPassangers = sc.nextInt();
+    sc.nextLine(); // Clear buffer after nextInt()
+    
+    for(int i = 0; i < this.NoOfPassangers; i++) {  
+        System.out.println("Enter Passenger " + (i + 1) + " Name Here:"); 
         this.Passenger_Name = sc.nextLine();
         System.out.println("Enter Your E-Mail Here:");
         this.Email = sc.nextLine();
@@ -63,7 +69,8 @@ class Passenger {
         System.out.println("Enter Your Age Here:");
         this.Age = sc.nextInt();
         sc.nextLine(); // Clear buffer
-
+    }
+    sc.close();
         return "Passenger: " + Passenger_Name + ", Email: " + Email + ", Mobile: " + Mobile_No + 
                ", Gender: " + Gender + ", Age: " + Age;
     }
@@ -77,11 +84,26 @@ class Login {
         this.Username = Username;
         this.Password = Password;
     }
+
+     public boolean UserLoginCredentials(String validUsername, String validPassword) {
+        return Username.equals(validUsername) && Password.equals(validPassword);
+    }
 }
+
+
 
 public class Lab_1C {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
+
+        System.out.println("Welcome To Ulitimate Railway Tickit Booking Platform:-");
+
+        Login login = new Login("espelho", "Hii");
+        if (login.UserLoginCredentials("espelho", "Hii")) {
+            System.out.println("Login successful!");
+        } else {
+            System.out.println("Invalid credentials.");
+        }
 
         //Collect Travel Details
         System.out.println("Enter The Boarding Station:-");
@@ -246,7 +268,23 @@ public class Lab_1C {
         Train train30 = new Train(12779, "Goa Express", 11, "Superfast", stationsTrain30, distancesTrain30);
 
 
+ // Search for matching trains
+        boolean found = false;
+        Train selectedTrain = null;
+        double TravelFare = 0;
+        int boardingIndex = -1;
+        int arrivingIndex = -1;
 
+        for (Train train : trains) {
+            boardingIndex = findStationIndex(train.Stations, Boarding);
+            arrivingIndex = findStationIndex(train.Stations, Arriving);
+
+            if (boardingIndex != -1 && arrivingIndex != -1 && boardingIndex < arrivingIndex) {
+                found = true;
+                if (selectedTrain == null) { // Select first match for booking
+                    selectedTrain = train;
+                    TravelFare = 0; 
+                }
 
 
 
@@ -276,13 +314,13 @@ public class Lab_1C {
             // Coach selection
             System.out.println("Select Coach Type (Sleeper/3AC/2AC/1AC):");
             String coachType = sc.nextLine();
-            Coach coach = new Coach(coachType, 100, 50, 30, 20); // Example capacities
+            Coach coach = new Coach(coachType, 100, 50, 30, 20); //Seats
             double coachFare = 0;
             switch (coachType.toLowerCase()) {
-                case "sleeper": coachFare = 300; break;
-                case "3ac": coachFare = 700; break;
-                case "2ac": coachFare = 1000; break;
-                case "1ac": coachFare = 1500; break;
+                case "sleeper": coachFare = (train.distance[arrivingIndex] - train.distance[boardingIndex])*1; break;
+                case "3ac": coachFare =(train.distance[arrivingIndex] - train.distance[boardingIndex])*2; break;
+                case "2ac": coachFare = (train.distance[arrivingIndex] - train.distance[boardingIndex])*3; break;
+                case "1ac": coachFare = (train.distance[arrivingIndex] - train.distance[boardingIndex])*4; break;
                 default: 
                     System.out.println("Invalid coach type, defaulting to Sleeper");
                     coachFare = 300;
